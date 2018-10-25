@@ -174,6 +174,36 @@ ruleTester.run('named', rule, {
       options: [{ commonjs: true }],
     }),
 
+    // destructured requires with commonjs option
+    test({
+      code: 'const { destructuredProp } = require("./named-exports")',
+      options: [{commonjs: true}],
+    }),
+    test({
+      code: 'let { arrayKeyProp } = require("./named-exports")',
+      options: [{commonjs: true}],
+    }),
+    test({
+      code: 'const { deepProp } = require("./named-exports")',
+      options: [{commonjs: true}],
+    }),
+
+    test({
+      code: 'const { foo, bar } = require("./re-export-names")',
+      options: [{commonjs: true}],
+    }),
+
+    test({
+      code: 'const { baz } = require("./bar")',
+      errors: [error('baz', './bar')],
+    }),
+
+    test({
+      code: 'const { baz } = require("./bar")',
+      errors: [error('baz', './bar')],
+      options: [{commonjs: false}],
+    }),
+
     ...SYNTAX_CASES,
   ],
 
@@ -234,6 +264,24 @@ ruleTester.run('named', rule, {
       code: 'import { baz } from "./broken-trampoline"',
       parser: require.resolve('babel-eslint'),
       errors: ['baz not found via broken-trampoline.js -> named-exports.js'],
+    }),
+
+    test({
+      code: 'const { baz } = require("./bar")',
+      errors: [error('baz', './bar')],
+      options: [{commonjs: true}],
+    }),
+
+    test({
+      code: 'let { baz } = require("./bar")',
+      errors: [error('baz', './bar')],
+      options: [{commonjs: true}],
+    }),
+
+    test({
+      code: 'const { baz: bar, bop } = require("./bar"), { a } = require("./re-export-names")',
+      errors: [error('baz', './bar'), error('bop', './bar'), error('a', './re-export-names')],
+      options: [{commonjs: true}],
     }),
 
     // parse errors
