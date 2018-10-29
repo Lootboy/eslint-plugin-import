@@ -37,6 +37,14 @@ ruleTester.run('named', rule, {
                 '// eslint-disable-line named' }),
 
     test({ code: 'import { foo, bar } from "./re-export-names"' }),
+    test({
+      code: 'import { foo, bar } from "./re-export-names-es5"',
+      options: [{ commonjs: { exports: true }}],
+     }),
+    test({
+      code: 'import { foo, bar } from "./re-export-names-es5"',
+      options: [{ commonjs: true }],
+    }),
 
     test({ code: 'import { foo, bar } from "./common"'
          , settings: { 'import/ignore': ['common'] } }),
@@ -69,6 +77,11 @@ ruleTester.run('named', rule, {
     test({ code: 'import { destructuredProp } from "./named-exports"' }),
     test({ code: 'import { arrayKeyProp } from "./named-exports"' }),
     test({ code: 'import { deepProp } from "./named-exports"' }),
+    test({ code: 'import { deepProp, deepSparseElement } from "./named-exports-es5"' }),
+    test({
+      code: 'import { deepProp, deepSparseElement } from "./named-exports-es5"',
+      options: [{ commonjs: { exports: true } }],
+     }),
     test({ code: 'import { deepSparseElement } from "./named-exports"' }),
 
     // should ignore imported/exported flow types, even if they don’t exist
@@ -122,6 +135,10 @@ ruleTester.run('named', rule, {
     test({
       code: '/*jsnext*/ import { createStore } from "redux"',
     }),
+    test({
+      code: 'import { createStore } from "redux/lib/index"',
+      options: [{ commonjs: true }],
+    }),
 
     // ignore is ignored if exports are found
     test({ code: 'import { foo } from "es6-module"' }),
@@ -144,6 +161,17 @@ ruleTester.run('named', rule, {
     }),
     test({
       code: 'import { common } from "./re-export-default"',
+    }),
+
+    // direct module exports cases
+    test({
+      code: 'import { a, c } from "./module-exports-direct"',
+      options: [{ commonjs: true }],
+    }),
+
+    test({
+      code: 'import { default as n } from "./module-exports-number"',
+      options: [{ commonjs: true }],
     }),
 
     ...SYNTAX_CASES,
@@ -175,7 +203,14 @@ ruleTester.run('named', rule, {
 
     test({
       code: 'import { a } from "./re-export-names"',
+      options: [{ commonjs: true }],
       errors: [error('a', './re-export-names')],
+    }),
+
+    test({
+      code: 'import { a } from "./re-export-names-es5"',
+      options: [{ commonjs: true }],
+      errors: [error('a', './re-export-names-es5')],
     }),
 
     // export tests
@@ -223,11 +258,23 @@ ruleTester.run('named', rule, {
       settings: { 'import/ignore': [] },
       errors: ["createSnorlax not found in 'redux'"],
     }),
+    test({
+      code: 'import { createSnorlax } from "redux/lib/index"',
+      settings: { 'import/ignore': [] },
+      options: [{ commonjs: true }],
+      errors: ["createSnorlax not found in 'redux/lib/index'"],
+    }),
     // should work without ignore
     test({
       code: '/*jsnext*/ import { createSnorlax } from "redux"',
       errors: ["createSnorlax not found in 'redux'"],
     }),
+    test({
+      code: 'import { createSnorlax } from "redux/lib/index"',
+      options: [{ commonjs: { exports: true } }],
+      errors: ["createSnorlax not found in 'redux/lib/index'"],
+    }),
+
 
     // ignore is ignored if exports are found
     test({
@@ -246,6 +293,19 @@ ruleTester.run('named', rule, {
     test({
       code: 'import { default as barDefault } from "./re-export"',
       errors: [`default not found in './re-export'`],
+    }),
+
+    // direct module.exports assignment
+    test({
+      code: 'import { b } from "./module-exports-direct"',
+      options: [{ commonjs: true }],
+      errors: [ error('b', './module-exports-direct') ],
+    }),
+
+    test({
+      code: 'import { noExports } from "./module-exports-number"',
+      options: [{ commonjs: true }],
+      errors: [ error('noExports', './module-exports-number') ],
     }),
   ],
 })
