@@ -98,14 +98,15 @@ module.exports = {
         }
 
         const call = node.init
-        const source = call.arguments[0]
-        const variableImports = node.id.properties
-        const variableExports = Exports.get(source.value, context, { useCommonjsExports })
 
         // return if it's not a commonjs require statement
         if (call.callee.type !== 'Identifier') return
         if (call.callee.name !== 'require') return
         if (call.arguments.length !== 1) return
+
+        const source = call.arguments[0]
+        const variableImports = node.id.properties
+        const variableExports = Exports.get(source.value, context, { useCommonjsExports })
 
         // return if it's not a string source
         if (source.type !== 'Literal') return
